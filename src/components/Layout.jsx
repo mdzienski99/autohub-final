@@ -12,7 +12,7 @@ export default function Layout({ session, children }) {
   return (
     <div className="app">
       <nav className="navbar">
-        <Link className="logo" to="/">🏎️ AutoHub Michal Dzienski Z23472823  </Link>
+        <Link className="logo" to="/">🏎️ AutoHub </Link>
 
         <div className="nav-links">
           <Link to="/">Garage Feed</Link>
