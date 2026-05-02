@@ -768,3 +768,44 @@ select:focus {
   margin: 0 0 16px;
   color: #cbd5e1;
 }
+
+.oauth-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 22px 0 16px;
+}
+
+.oauth-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: white;
+  font-weight: 900;
+}
+
+.github-btn {
+  background: rgba(15, 23, 42, 0.95);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #94a3b8;
+  margin: 8px 0 18px;
+  font-size: 0.9rem;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 650px) {
+  .oauth-row {
+    grid-template-columns: 1fr;
+  }
+}

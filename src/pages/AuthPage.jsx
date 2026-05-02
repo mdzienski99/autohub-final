@@ -25,6 +25,25 @@ export default function AuthPage({ session }) {
     if (data) {
       setDisplayName(data.display_name || "");
       setAvatar(data.avatar || "🚗");
+    } else if (session?.user) {
+      await supabase.from("profiles").insert([
+        {
+          id: session.user.id,
+          display_name:
+            session.user.user_metadata?.full_name ||
+            session.user.user_metadata?.name ||
+            session.user.email?.split("@")[0] ||
+            "AutoHub Driver",
+          avatar: "🚗",
+        },
+      ]);
+
+      setDisplayName(
+        session.user.user_metadata?.full_name ||
+          session.user.user_metadata?.name ||
+          session.user.email?.split("@")[0] ||
+          "AutoHub Driver"
+      );
     }
   }
 
@@ -32,7 +51,11 @@ export default function AuthPage({ session }) {
     e.preventDefault();
     setMessage("");
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
     setMessage(error ? error.message : "Logged in successfully.");
   }
 
@@ -40,7 +63,10 @@ export default function AuthPage({ session }) {
     e.preventDefault();
     setMessage("");
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
     if (error) {
       setMessage(error.message);
@@ -58,6 +84,21 @@ export default function AuthPage({ session }) {
     }
 
     setMessage("Account created successfully.");
+  }
+
+  async function loginWithProvider(provider) {
+    setMessage("");
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+
+    if (error) {
+      setMessage(error.message);
+    }
   }
 
   async function saveProfile(e) {
@@ -98,7 +139,9 @@ export default function AuthPage({ session }) {
                 <button
                   type="button"
                   key={item}
-                  className={`avatar-choice ${avatar === item ? "selected-avatar" : ""}`}
+                  className={`avatar-choice ${
+                    avatar === item ? "selected-avatar" : ""
+                  }`}
                   onClick={() => setAvatar(item)}
                 >
                   {item}
@@ -121,8 +164,30 @@ export default function AuthPage({ session }) {
         <p className="eyebrow">Join the Garage</p>
         <h1>Login or create an account</h1>
         <p className="subtext">
-          Use an email and password to post builds, comment, upvote, and manage your own AutoHub posts.
+          Use email/password, Google, or GitHub to post builds, comment, and upvote.
         </p>
+
+        <div className="oauth-row">
+          <button
+            type="button"
+            className="oauth-btn"
+            onClick={() => loginWithProvider("google")}
+          >
+            Continue with Google
+          </button>
+
+          <button
+            type="button"
+            className="oauth-btn github-btn"
+            onClick={() => loginWithProvider("github")}
+          >
+            Continue with GitHub
+          </button>
+        </div>
+
+        <div className="divider">
+          <span>or use email</span>
+        </div>
 
         <form className="form">
           <label>Email</label>
@@ -143,7 +208,9 @@ export default function AuthPage({ session }) {
 
           <div className="button-row">
             <button onClick={login}>Login</button>
-            <button className="secondary" onClick={signup}>Sign Up</button>
+            <button className="secondary" onClick={signup}>
+              Sign Up
+            </button>
           </div>
 
           {message && <p className="message">{message}</p>}
